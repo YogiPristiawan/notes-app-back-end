@@ -1,4 +1,6 @@
 const { nanoid } = require('nanoid')
+const InvariantError = require('../../exceptions/NotFoundError')
+const NotFoundError = require('../../exceptions/NotFoundError')
 
 class NotesService {
   constructor() {
@@ -22,7 +24,7 @@ class NotesService {
       return id
     }
 
-    throw new Error('Data gagal ditambahkan')
+    throw new InvariantError('Data gagal ditambahkan')
   }
 
   getAllNote() {
@@ -36,7 +38,7 @@ class NotesService {
       return note
     }
 
-    throw new Error('Catatan tidak ditemukan')
+    throw new NotFoundError('Catatan tidak ditemukan')
   }
 
   editNoteById({ id, payload }) {
@@ -57,7 +59,7 @@ class NotesService {
       return 'Catatan berhasil diperbarui'
     }
 
-    throw new Error('Gagal memeperbarui catatan. Id tidak ditemukan')
+    throw new NotFoundError('Gagal memeperbarui catatan. Id tidak ditemukan')
   }
 
   deleteNoteById(id) {
@@ -68,7 +70,7 @@ class NotesService {
       return 'Catatan berhasil dihapus'
     }
 
-    throw new Error('Catatan gagal dihapus. Id tidak ditemukan')
+    throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan')
   }
 }
 
