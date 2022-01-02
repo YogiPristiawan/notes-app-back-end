@@ -11,13 +11,13 @@ class NotesHandler {
     this.deleteNoteByIdHandler = this.deleteNoteByIdHandler.bind(this)
   }
 
-  postNoteHandler(request, h) {
+  async postNoteHandler(request, h) {
     try {
       this._validator.validateNotePayload(request.payload)
 
       const { title = 'untitled', tags, body } = request.payload
 
-      const id = this._service.addNote({
+      const id = await this._service.addNote({
         title,
         tags,
         body,
@@ -47,8 +47,8 @@ class NotesHandler {
     }
   }
 
-  getNotesHandler(request, h) {
-    const notes = this._service.getAllNote()
+  async getNotesHandler(request, h) {
+    const notes = await this._service.getNotes()
 
     return h.response({
       status: 'success',
@@ -58,11 +58,11 @@ class NotesHandler {
     })
   }
 
-  getNoteByIdHandler(request, h) {
+  async getNoteByIdHandler(request, h) {
     try {
       const { id } = request.params
 
-      const note = this._service.getNoteById(id)
+      const note = await this._service.getNoteById(id)
 
       return h.response({
         status: 'success',
@@ -87,13 +87,14 @@ class NotesHandler {
     }
   }
 
-  putNoteByIdHandler(request, h) {
+  async putNoteByIdHandler(request, h) {
     try {
       this._validator.validateNotePayload(request.payload)
 
       const { id } = request.params
+      const { title, body, tags } = request.payload
 
-      this._service.editNoteById({ id, payload: request.payload })
+      await this._service.editNoteById(id, { title, body, tags })
 
       const response = h.response({
         status: 'success',
@@ -118,17 +119,18 @@ class NotesHandler {
     }
   }
 
-  deleteNoteByIdHandler(request, h) {
+  async deleteNoteByIdHandler(request, h) {
     try {
       const { id } = request.params
 
-      const result = this._service.deleteNoteById(id)
+      await this._service.deleteNoteById(id)
 
       return h.response({
         status: 'success',
-        message: result,
+        message: 'Catatan berhasil dihapus',
       })
     } catch (err) {
+      console.log(err)
       if (err instanceof ClientError) {
         return h.response({
           status: 'fail',

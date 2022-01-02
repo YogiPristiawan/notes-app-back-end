@@ -67,9 +67,11 @@ class NotesService {
 
     const result = await this._pool.query(query)
 
-    if (!result.rows.lengh) {
+    if (!result.rows.length) {
       throw new NotFoundError('Gagal memperbaruai catatan. Id tidak ditemukan.')
     }
+
+    return result
   }
 
   async deleteNoteById(id) {

@@ -27,7 +27,7 @@ class NotesService {
     throw new InvariantError('Data gagal ditambahkan')
   }
 
-  getAllNote() {
+  getNotes() {
     return this._notes
   }
 
@@ -41,8 +41,7 @@ class NotesService {
     throw new NotFoundError('Catatan tidak ditemukan')
   }
 
-  editNoteById({ id, payload }) {
-    const { title, tags, body } = payload
+  editNoteById(id, { title, body, tags }) {
     const updatedAt = new Date().toISOString()
 
     const index = this._notes.findIndex((note) => note.id === id)
