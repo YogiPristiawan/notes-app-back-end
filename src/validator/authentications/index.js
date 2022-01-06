@@ -6,7 +6,7 @@ const {
 } = require('./schema')
 
 const AuthenticationsValidator = {
-  validatePostAuthenticationPayloadSchema: (payload) => {
+  validatePostAuthenticationPayload: (payload) => {
     const { error } = PostAuthenticationPayloadSchema.validate(payload)
 
     if (error) {
@@ -14,7 +14,7 @@ const AuthenticationsValidator = {
     }
   },
 
-  validatePutAuthenticationPayloadSchema: (payload) => {
+  validatePutAuthenticationPayload: (payload) => {
     const { error } = PutAuthenticationPayloadSchema.validate(payload)
 
     if (error) {
@@ -22,7 +22,7 @@ const AuthenticationsValidator = {
     }
   },
 
-  validateDeleteAuthenticationPayloadSchema: (payload) => {
+  validateDeleteAuthenticationPayload: (payload) => {
     const { error } = DeleteAuthenticationPayloadSchema.validate(payload)
 
     if (error) {
