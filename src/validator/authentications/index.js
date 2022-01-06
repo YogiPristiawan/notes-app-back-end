@@ -22,7 +22,7 @@ const AuthenticationsValidator = {
     }
   },
 
-  validaetDeleteAuthenticationPayloadSchema: (payload) => {
+  validateDeleteAuthenticationPayloadSchema: (payload) => {
     const { error } = DeleteAuthenticationPayloadSchema.validate(payload)
 
     if (error) {

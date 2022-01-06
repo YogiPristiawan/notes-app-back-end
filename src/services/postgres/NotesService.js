@@ -38,7 +38,7 @@ class NotesService {
     const result = await this._pool.query('SELECT * FROM notes')
 
     if (!result.rows.length) {
-      throw NotFoundError('Catatan tidak ditemukan')
+      throw new NotFoundError('Catatan tidak ditemukan')
     }
 
     return result.rows.map(mapDBToModel)

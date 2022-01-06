@@ -1,15 +1,15 @@
 const Joi = require('joi')
 
-const PostAuthenticationPayloadSchema = Joi.Object({
+const PostAuthenticationPayloadSchema = Joi.object({
   username: Joi.string().required(),
   password: Joi.string().required(),
 })
 
-const PutAuthenticationPayloadSchema = Joi.Object({
+const PutAuthenticationPayloadSchema = Joi.object({
   refreshToken: Joi.string().required(),
 })
 
-const DeleteAuthenticationPayloadSchema = Joi.Object({
+const DeleteAuthenticationPayloadSchema = Joi.object({
   refreshToken: Joi.string().required(),
 })
 
