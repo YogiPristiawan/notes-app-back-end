@@ -4,6 +4,7 @@ const Hapi = require('@hapi/hapi')
 /**
  * notes
  */
+const Jwt = require('@hapi/jwt')
 const notesPlugin = require('./api/notes')
 const NotesService = require('./services/postgres/NotesService')
 const NotesValidator = require('./validator/notes')
@@ -42,6 +43,28 @@ const init = async () => {
     method: 'GET',
     path: '/about',
     handler: () => 'About page',
+  })
+
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ])
+
+  server.auth.strategy('notesapp_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
   })
 
   await server.register([
