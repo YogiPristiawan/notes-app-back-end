@@ -1,4 +1,5 @@
 const ClientError = require('../../exceptions/ClientError')
+const NotFoundError = require('../../exceptions/NotFoundError')
 
 class NotesHandler {
   constructor(service, validator) {
@@ -61,7 +62,14 @@ class NotesHandler {
         },
       })
     } catch (err) {
-      if (err instanceof ClientError) {
+      if (err instanceof NotFoundError) {
+        return h.response({
+          status: 'fail',
+          data: {
+            notes: [],
+          },
+        }).code(200)
+      } if (err instanceof ClientError) {
         return h.response({
           status: 'fail',
           message: err.message,
@@ -82,7 +90,7 @@ class NotesHandler {
       const { id } = request.params
       const { id: credentialId } = request.auth.credentials
 
-      await this._service.verifyNoteOwner(id, credentialId)
+      await this._service.verifyNoteAccess(id, credentialId)
       const note = await this._service.getNoteById(id)
 
       return h.response({
@@ -116,7 +124,7 @@ class NotesHandler {
       const { title, body, tags } = request.payload
       const { id: credentialId } = request.auth.credentials
 
-      await this._service.verifyNoteOwner(id, credentialId)
+      await this._service.verifyNoteAccess(id, credentialId)
       await this._service.editNoteById(id, { title, body, tags })
 
       const response = h.response({

@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 const { Pool } = require('pg')
 const { nanoid } = require('nanoid')
 const InvariantError = require('../../exceptions/InvariantError')
@@ -6,7 +7,7 @@ const NotFoundError = require('../../exceptions/NotFoundError')
 const AuthorizationError = require('../../exceptions/AuthorizationError')
 
 class NotesService {
-  constructor() {
+  constructor(collaborationService) {
     this._pool = new Pool({
       host: process.env.PGHOST || 'localhost',
       port: process.env.PGPORT || '5432',
@@ -14,6 +15,8 @@ class NotesService {
       user: process.env.PGUSER || 'postgres',
       password: process.env.PGPASSWORD || '',
     })
+
+    this._collaborationService = collaborationService
   }
 
   async addNote({
@@ -39,7 +42,13 @@ class NotesService {
 
   async getNotes(owner) {
     const query = {
-      text: 'SELECT * FROM notes WHERE owner = $1',
+      text: `SELECT notes.*
+      FROM notes
+      LEFT JOIN collaborations
+      ON collaborations.note_id = notes.id
+      WHERE
+      collaborations.user_id = $1 OR notes.owner = $1
+      GROUP BY notes.id`,
       values: [owner],
     }
     const result = await this._pool.query(query)
@@ -53,7 +62,10 @@ class NotesService {
 
   async getNoteById(id) {
     const query = {
-      text: 'SELECT * FROM notes WHERE id = $1',
+      text: `SELECT notes.*, users.username
+    FROM notes
+    LEFT JOIN users ON users.id = notes.owner
+    WHERE notes.id = $1`,
       values: [id],
     }
     const result = await this._pool.query(query)
@@ -110,6 +122,21 @@ class NotesService {
 
     if (note.owner !== owner) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini')
+    }
+  }
+
+  async verifyNoteAccess(noteId, userId) {
+    try {
+      await this.verifyNoteOwner(noteId, userId)
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        throw err
+      }
+      try {
+        await this._collaborationService.verifyCollaboration(noteId, userId)
+      } catch {
+        throw err
+      }
     }
   }
 }
