@@ -1,3 +1,4 @@
-/node_modules
-/my-notes.txt
-/.env
+node_modules
+my-notes.txt
+.env
+uploads

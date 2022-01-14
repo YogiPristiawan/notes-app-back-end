@@ -6,7 +6,7 @@ class PostsImageHandler {
     const { image } = request.payload
 
     const { filename } = image.hapi
-    const directory = path.resolve(__dirname, 'uploads')
+    const directory = path.resolve('uploads')
     if (!fs.existsSync(directory)) {
       fs.mkdirSync(directory)
     }
