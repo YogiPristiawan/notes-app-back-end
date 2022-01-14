@@ -1,11 +1,12 @@
 require('dotenv').config()
 const Hapi = require('@hapi/hapi')
 const path = require('path')
+const Jwt = require('@hapi/jwt')
+const Inert = require('@hapi/inert')
 
 /**
  * notes
  */
-const Jwt = require('@hapi/jwt')
 const notesPlugin = require('./api/notes')
 const NotesService = require('./services/postgres/NotesService')
 const NotesValidator = require('./validator/notes')
@@ -72,6 +73,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     },
   ])
 
