@@ -38,6 +38,11 @@ const exportsPlugin = require('./api/exports')
 const ProducerService = require('./services/rabbitmq/ProducerService')
 const ExportNotesValidator = require('./validator/exports')
 
+/**
+ * posts image
+ */
+const postsImagePlugin = require('./api/posts')
+
 const init = async () => {
   const collaborationsService = new CollaborationsService()
   const notesService = new NotesService(collaborationsService)
@@ -120,6 +125,9 @@ const init = async () => {
         service: ProducerService,
         validator: ExportNotesValidator,
       },
+    },
+    {
+      plugin: postsImagePlugin,
     },
   ])
 
