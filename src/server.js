@@ -1,5 +1,6 @@
 require('dotenv').config()
 const Hapi = require('@hapi/hapi')
+const path = require('path')
 
 /**
  * notes
@@ -42,12 +43,15 @@ const ExportNotesValidator = require('./validator/exports')
  * posts image
  */
 const postsImagePlugin = require('./api/posts')
+const UploadsValidator = require('./validator/uploads')
+const StorageService = require('./services/storage/StorageService')
 
 const init = async () => {
   const collaborationsService = new CollaborationsService()
   const notesService = new NotesService(collaborationsService)
   const usersService = new UsersService()
   const authenticationsService = new AuthenticationsService()
+  const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'))
 
   const server = Hapi.server({
     port: process.env.PORT || '5000',
@@ -128,6 +132,10 @@ const init = async () => {
     },
     {
       plugin: postsImagePlugin,
+      options: {
+        service: storageService,
+        validator: UploadsValidator,
+      },
     },
   ])
 

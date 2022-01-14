@@ -1,35 +1,42 @@
-const fs = require('fs')
-const path = require('path')
+const ClientError = require('../../exceptions/ClientError')
 
 class PostsImageHandler {
+  constructor(service, validator) {
+    this._service = service
+    this._validator = validator
+
+    this.postPostImageHandler = this.postPostImageHandler.bind(this)
+  }
+
   async postPostImageHandler(request, h) {
-    const { image } = request.payload
-
-    const { filename } = image.hapi
-    const directory = path.resolve('uploads')
-    if (!fs.existsSync(directory)) {
-      fs.mkdirSync(directory)
-    }
-
-    const location = `${directory}/${filename}`
-    const fileStream = fs.createWriteStream(location)
-
     try {
-      const result = await new Promise((resolve, reject) => {
-        fileStream.on('erorr', (error) => reject(error))
+      const { image } = request.payload
+      this._validator.validateImageHeaders(image.hapi.headers)
 
-        image.pipe(fileStream)
+      const filename = await this._service.writeFile(image, image.hapi)
 
-        image.on('end', () => resolve(filename))
+      const response = h.response({
+        status: 'success',
+        data: {
+          fileLocation: `http://${process.env.HOST}:${process.env.PORT}/upload/images/${filename}`,
+        },
       })
-
-      return h.response({
-        message: `Gambar ${result} berhasil diproses`,
-      })
+      response.code(201)
+      return response
     } catch (err) {
+      if (err instanceof ClientError) {
+        return h.response({
+          status: 'fail',
+          messge: err.message,
+        }).code(err.statusCode)
+      }
+
+      console.error(err)
+
       return h.response({
-        message: 'Gambar gagal diproses',
-      })
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami',
+      }).code(500)
     }
   }
 }
